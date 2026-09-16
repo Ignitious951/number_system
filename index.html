@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Number System Conversion App</title>
+  <meta name="description" content="Convert numbers instantly between Binary, Octal, Decimal and Hexadecimal." />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- iOS Specific Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Number System" />
+  <link rel="apple-touch-icon" href="icon.png" />
+
+  <!-- Theme color for Android -->
+  <meta name="theme-color" content="#1f7aec" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #e8eefc 0%, #f3e8ff 100%);
+      min-height: 100vh;
+      padding: 24px 16px;
+      color: #1a2233;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 28px 22px;
+      box-shadow: 0 12px 40px rgba(31, 122, 236, 0.12);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1f7aec 0%, #1a4fb5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f3a8a;
+      line-height: 1.1;
+    }
+
+    .brand .subtitle {
+      font-size: 11px;
+      color: #6b7a99;
+      margin-top: 2px;
+    }
+
+    .live-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: #1f7aec;
+      background: #e8f0fe;
+      padding: 6px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    /* Input section */
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6b7a99;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    #numberInput {
+      flex: 1;
+      padding: 14px 16px;
+      font-size: 20px;
+      font-weight: 600;
+      border: 1.5px solid #dbe3f0;
+      border-radius: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fff;
+      color: #1a2233;
+      min-width: 0;
+    }
+
+    #numberInput:focus {
+      border-color: #1f7aec;
+      box-shadow: 0 0 0 3px rgba(31, 122, 236, 0.1);
+    }
+
+    #baseSelect {
+      padding: 14px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1.5px solid #dbe3f0;
+      border-radius: 14px;
+      outline: none;
+      background: #fff;
+      color: #1a2233;
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 14px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      flex: 1.3;
+      background: #1f7aec;
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(31, 122, 236, 0.3);
+    }
+
+    .btn-primary:hover { background: #1663c9; }
+
+    .btn-secondary {
+      flex: 1;
+      background: #f4f6fb;
+      color: #1a2233;
+      border: 1px solid #e3e8f2;
+    }
+
+    .btn-secondary:hover { background: #e9edf6; }
+
+    /* Results */
+    .results-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6b7a99;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: inline-block;
+    }
+
+    .results {
+      background: #f7f9fe;
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .result-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: #1f7aec;
+      background: #e8f0fe;
+      letter-spacing: 0.3px;
+      min-width: 38px;
+      text-align: center;
+    }
+
+    .result-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a2233;
+      flex: 1;
+    }
+
+    .result-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a2233;
+      background: #f4f6fb;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      max-width: 160px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      border-radius: 8px;
+      transition: background 0.15s;
+      line-height: 1;
+    }
+
+    .copy-btn:hover { background: #eef2fa; }
+
+    /* Download button */
+    .download-wrap {
+      text-align: center;
+      padding-top: 18px;
+      border-top: 1px dashed #e3e8f2;
+    }
+
+    .btn-download {
+      background: #22b573;
+      color: #fff;
+      padding: 15px 26px;
+      font-size: 15px;
+      width: 100%;
+      max-width: 320px;
+      box-shadow: 0 6px 18px rgba(34, 181, 115, 0.3);
+    }
+
+    .btn-download:hover { background: #1da166; }
+
+    .download-note {
+      font-size: 11px;
+      color: #8a96ab;
+      margin-top: 10px;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: #8a96ab;
+      margin-top: 20px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a2233;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Small screens */
+    @media (max-width: 380px) {
+      .input-row { flex-direction: column; }
+      .actions { flex-wrap: wrap; }
+      .btn-primary { flex: 1 1 100%; }
+      .btn-secondary { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="brand">
+        <div class="logo">#</div>
+        <div>
+          <h1>Number System Converter</h1>
+          <div class="subtitle">Binary · Octal · Decimal · Hex</div>
+        </div>
+      </div>
+      <div class="live-badge">LIVE</div>
+    </div>
+
+    <!-- Input -->
+    <div class="label">Your Number</div>
+    <div class="input-row">
+      <input
+        type="text"
+        id="numberInput"
+        value="60"
+        placeholder="Enter a number..."
+        autocomplete="off"
+      />
+      <select id="baseSelect">
+        <option value="2">BIN (2)</option>
+        <option value="8">OCT (8)</option>
+        <option value="10">DEC (10)</option>
+        <option value="16" selected>HEX (16)</option>
+      </select>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-primary" id="convertBtn">⟳ Convert now</button>
+      <button class="btn btn-secondary" id="swapBtn">⇄ Swap base</button>
+      <button class="btn btn-secondary" id="clearBtn">✕ Clear</button>
+    </div>
+
+    <!-- Results -->
+    <div class="results-title">
+      <span class="dot"></span> CONVERTED VALUES
+    </div>
+
+    <div class="results">
+      <div class="result-row">
+        <span class="tag">BIN</span>
+        <span class="result-label">Binary</span>
+        <span class="result-value" id="binValue">—</span>
+        <button class="copy-btn" data-target="binValue" title="Copy">📋</button>
+      </div>
+
+      <div class="result-row">
+        <span class="tag">OCT</span>
+        <span class="result-label">Octal</span>
+        <span class="result-value" id="octValue">—</span>
+        <button class="copy-btn" data-target="octValue" title="Copy">📋</button>
+      </div>
+
+      <div class="result-row">
+        <span class="tag">DEC</span>
+        <span class="result-label">Decimal</span>
+        <span class="result-value" id="decValue">—</span>
+        <button class="copy-btn" data-target="decValue" title="Copy">📋</button>
+      </div>
+
+      <div class="result-row">
+        <span class="tag">HEX</span>
+        <span class="result-label">Hexadecimal</span>
+        <span class="result-value" id="hexValue">—</span>
+        <button class="copy-btn" data-target="hexValue" title="Copy">📋</button>
+      </div>
+    </div>
+
+    <!-- Download / Install -->
+    <div class="download-wrap">
+      <button class="btn btn-download" id="installBtn">⬇ Download this app</button>
+      <div class="download-note" id="installNote">
+        Save the HTML file · Open it offline anywhere
+      </div>
+    </div>
+
+    <div class="footer-note">
+       Instant conversion · Works on Android &amp; iOS · 
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---------- Elements ----------
+    const numberInput = document.getElementById("numberInput");
+    const baseSelect  = document.getElementById("baseSelect");
+    const convertBtn  = document.getElementById("convertBtn");
+    const swapBtn     = document.getElementById("swapBtn");
+    const clearBtn    = document.getElementById("clearBtn");
+    const installBtn  = document.getElementById("installBtn");
+    const installNote = document.getElementById("installNote");
+    const toast       = document.getElementById("toast");
+
+    const fields = {
+      2:  document.getElementById("binValue"),
+      8:  document.getElementById("octValue"),
+      10: document.getElementById("decValue"),
+      16: document.getElementById("hexValue"),
+    };
+
+    // ---------- Toast helper ----------
+    let toastTimer;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+    }
+
+    // ---------- Conversion ----------
+    function convert() {
+      const raw = numberInput.value.trim().replace(/\s+/g, "");
+      const fromBase = parseInt(baseSelect.value, 10);
+
+      if (raw === "") {
+        Object.values(fields).forEach(f => f.textContent = "—");
+        return;
+      }
+
+      // Validate input for the chosen base
+      const validChars = {
+        2:  /^[01]+$/,
+        8:  /^[0-7]+$/,
+        10: /^[0-9]+$/,
+        16: /^[0-9a-fA-F]+$/,
+      };
+
+      if (!validChars[fromBase].test(raw)) {
+        Object.values(fields).forEach(f => f.textContent = "invalid");
+        return;
+      }
+
+      const decimal = parseInt(raw, fromBase);
+      if (isNaN(decimal)) {
+        Object.values(fields).forEach(f => f.textContent = "—");
+        return;
+      }
+
+      fields[2].textContent  = decimal.toString(2).toUpperCase();
+      fields[8].textContent  = decimal.toString(8).toUpperCase();
+      fields[10].textContent = decimal.toString(10).toUpperCase();
+      fields[16].textContent = decimal.toString(16).toUpperCase();
+    }
+
+    // ---------- Events ----------
+    numberInput.addEventListener("input", convert);
+    baseSelect.addEventListener("change", convert);
+    convertBtn.addEventListener("click", () => {
+      convert();
+      showToast("Converted ✅");
+    });
+
+    swapBtn.addEventListener("click", () => {
+      // Swap: take current output of selected target base... simple demo = switch base
+      const currentBase = baseSelect.value;
+      // Cycle through bases
+      const order = ["2", "8", "10", "16"];
+      const next = order[(order.indexOf(currentBase) + 1) % order.length];
+      baseSelect.value = next;
+      convert();
+      showToast("Base changed to " + next);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      numberInput.value = "";
+      Object.values(fields).forEach(f => f.textContent = "—");
+      showToast("Cleared");
+      numberInput.focus();
+    });
+
+    // Copy buttons
+    document.querySelectorAll(".copy-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = document.getElementById(btn.dataset.target);
+        const text = target.textContent;
+        if (!text || text === "—" || text === "invalid") {
+          showToast("Nothing to copy");
+          return;
+        }
+        navigator.clipboard.writeText(text)
+          .then(() => showToast("Copied: " + text))
+          .catch(() => showToast("Copy failed"));
+      });
+    });
+
+    // ---------- PWA Install ----------
+    let deferredPrompt = null;
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      deferredPrompt = e;
+      installNote.textContent = "Tap to install on your device";
+    });
+
+    installBtn.addEventListener("click", async () => {
+      // 1) Android/Chrome: use native install prompt
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") showToast("Installing... 🎉");
+        else showToast("Install dismissed");
+        deferredPrompt = null;
+        return;
+      }
+
+      // 2) iOS: show manual instructions
+      const ua = window.navigator.userAgent.toLowerCase();
+      const isIOS = /iphone|ipad|ipod/.test(ua);
+      const isAndroid = /android/.test(ua);
+
+      if (isIOS) {
+        showToast("Tap Share → Add to Home Screen");
+        alert(
+          "To install on iOS:\n\n" +
+          "1. Tap the Share button (□ with ↑)\n" +
+          "2. Scroll down and tap 'Add to Home Screen'\n" +
+          "3. Tap 'Add'"
+        );
+      } else if (isAndroid) {
+        showToast("Open browser menu → Install app");
+        alert(
+          "To install on Android:\n\n" +
+          "1. Tap the ⋮ menu (top right)\n" +
+          "2. Tap 'Install app' or 'Add to Home screen'\n" +
+          "3. Confirm"
+        );
+      } else {
+        showToast("Open this page on your phone to install");
+        alert(
+          "Open this page on your phone's browser to install:\n\n" +
+          "• Android Chrome → menu → Install app\n" +
+          "• iOS Safari → Share → Add to Home Screen"
+        );
+      }
+    });
+
+    // If app is already installed
+    window.addEventListener("appinstalled", () => {
+      showToast("App installed 🎉");
+      installNote.textContent = "Installed! Find it on your home screen.";
+      deferredPrompt = null;
+    });
+
+    // ---------- Init ----------
+    convert();
+  </script>
+</body>
+</html>
